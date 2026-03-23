@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Jairo Cibrian | Portafolio de Mampostería</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --color-arena: #f2ebe1;
+      --color-naranja-oxido: #c2410c;
+      --color-verde-cactus: #2d5a27;
+      --color-tierra: #44403c;
+    }
+    body {
+      background-color: var(--color-arena);
+      color: var(--color-tierra);
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+    }
+    .stone-pattern {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='120' viewBox='0 0 160 120'%3E%3Cg stroke='%23c2410c' stroke-width='1.2' stroke-opacity='0.1' fill='none'%3E%3Cpath d='M0 0 h40 v25 h-40 z'/%3E%3Cpath d='M40 0 h45 v20 h-45 z'/%3E%3Cpath d='M85 0 h35 v20 h-35 z'/%3E%3Cpath d='M120 0 h40 v25 h-40 z'/%3E%3Cpath d='M-20 25 h50 v15 h-50 z'/%3E%3Cpath d='M30 25 h50 v20 h-50 z'/%3E%3Cpath d='M80 20 h40 v15 h-40 z'/%3E%3Cpath d='M120 20 h40 v30 h-40 z'/%3E%3Cpath d='M0 55 h35 v25 h-35 z'/%3E%3Cpath d='M35 55 h25 v25 h-25 z'/%3E%3Cpath d='M60 45 h40 v35 h-40 z'/%3E%3Cpath d='M60 50 h100 v20 h-100 z'/%3E%3Cpath d='M-15 80 h60 v18 h-60 z'/%3E%3Cpath d='M45 80 h35 v20 h-35 z'/%3E%3Cpath d='M80 80 h40 v20 h-40 z'/%3E%3Cpath d='M120 70 h55 v50 h-55 z'/%3E%3Cpath d='M45 100 h35 v20 h-35 z'/%3E%3Cpath d='M80 100 h40 v20 h-40 z'/%3E%3C/g%3E%3C/svg%3E");
+      background-size: 140px;
+    }
+    .tech-font { font-family: 'JetBrains Mono', monospace; }
+    .comparison-container {
+      position: relative;
+      width: 100%;
+      height: 450px;
+      overflow: hidden;
+      border-radius: 12px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+      user-select: none;
+      touch-action: none;
+    }
+    .comparison-img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      pointer-events: none;
+    }
+    .img-before { z-index: 1; }
+    .img-after { z-index: 2; clip-path: inset(0 50% 0 0); }
+    .slider-handle {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 4px;
+      background: white;
+      z-index: 3;
+      cursor: ew-resize;
+      transform: translateX(-50%);
+    }
+    .slider-button {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 40px;
+      height: 40px;
+      background: var(--color-naranja-oxido);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      box-shadow: 0 0 15px rgba(0,0,0,0.3);
+      pointer-events: none;
+    }
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(28, 25, 23, 0.98);
+      z-index: 100;
+      overflow-y: auto;
+      backdrop-filter: blur(10px);
+    }
+    .modal-content {
+      max-width: 1000px;
+      margin: 50px auto;
+      background: var(--color-arena);
+      border-radius: 20px;
+      overflow: hidden;
+      position: relative;
+    }
+    .close-modal {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      color: white;
+      font-size: 30px;
+      cursor: pointer;
+      z-index: 110;
+    }
+    .project-card {
+      background: rgba(255, 255, 255, 0.4);
+      border: 1px solid rgba(44, 64, 60, 0.1);
+      backdrop-filter: blur(5px);
+      transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+      cursor: pointer;
+    }
+    .project-card:hover {
+      background: white;
+      border-color: var(--color-verde-cactus);
+      transform: translateY(-8px);
+      box-shadow: 0 30px 60px -12px rgba(44, 64, 60, 0.2);
+    }
+    .label-tag {
+      background: var(--color-verde-cactus);
+      color: white;
+      padding: 4px 12px;
+      font-size: 0.65rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      border-radius: 20px;
+    }
+    html { scroll-behavior: smooth; }
+    @keyframes pulse-border {
+      0% { box-shadow: 0 0 0 0 rgba(194, 65, 12, 0.4); }
+      70% { box-shadow: 0 0 0 15px rgba(194, 65, 12, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(194, 65, 12, 0); }
+    }
+    .btn-pulse { animation: pulse-border 2s infinite; }
+    .nav-logo {
+      height: 55px;
+      width: 55px;
+      object-fit: cover;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      cursor: pointer;
+      transition: transform 0.3s ease;
+      background: white;
+    }
+    .lang-switch {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(255,255,255,0.8);
+      padding: 4px 12px;
+      border-radius: 20px;
+      border: 1px solid #ddd;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 12px;
+      padding: 20px;
+    }
+    .gallery-item {
+      aspect-ratio: 1/1;
+      overflow: hidden;
+      border-radius: 8px;
+      background: #e5e7eb;
+      position: relative;
+    }
+    .gallery-item img, .gallery-item video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.5s ease;
+    }
+    .gallery-item:hover img, .gallery-item:hover video {
+      transform: scale(1.1);
+    }
+    .video-overlay {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(194, 65, 12, 0.9);
+      color: white;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+  </style>
+</head>
+<body class="stone-pattern" id="top">
+  <!-- Navegación -->
+  <nav class="fixed w-full z-50 px-6 py-6 transition-all duration-300" id="main-nav">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+      <div class="flex flex-col">
+        <span class="text-2xl font-black uppercase tracking-tighter text-stone-900 leading-none cursor-pointer" onclick="scrollToSection(event, 'top')">Jairo Cibrian</span>
+        <span class="tech-font text-[10px] text-green-800 font-bold uppercase tracking-widest mt-1" data-i18n="nav-subtitle">Artisan Masonry</span>
+      </div>
+      <div class="flex items-center gap-4 md:gap-12">
+        <button onclick="toggleLanguage()" class="lang-switch tech-font text-[10px] uppercase font-bold">
+          <span id="lang-label">ESP</span>
+        </button><div class="hidden lg:flex items-center gap-10 tech-font text-xs font-bold text-stone-700">
+          <button onclick="scrollToSection(event, 'projects')" class="hover:text-orange-700 transition uppercase" data-i18n="nav-projects">Projects</button>
+          <button onclick="scrollToSection(event, 'services')" class="hover:text-orange-700 transition uppercase" data-i18n="nav-services">Services</button>
+          <button onclick="scrollToSection(event, 'contact')" class="bg-orange-700 text-white px-6 py-3 rounded-full hover:bg-stone-900 transition shadow-lg uppercase" data-i18n="nav-cta">Get a Free Quote</button>
+        </div>
+        <img src="logo.jpg" alt="Logo" class="nav-logo" onclick="scrollToSection(event, 'top')" onerror="this.src='https://via.placeholder.com/100?text=LOGO'">
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <header class="min-h-screen flex flex-col justify-center items-center text-center px-6 relative">
+    <div class="w-20 h-1 bg-orange-700 mb-8"></div>
+    <h1 class="text-6xl md:text-8xl font-black uppercase text-stone-900 tracking-tighter leading-none mb-6" data-i18n="hero-title">Stone &<br>Legacy</h1>
+    <p class="max-w-2xl text-xl text-stone-600 font-light italic mb-12" data-i18n="hero-quote">"Building with the strength of nature and the precision of a master craftsman."</p>
+    <div class="flex flex-col sm:flex-row gap-6">
+      <button onclick="scrollToSection(event, 'contact')" class="btn-pulse bg-orange-700 text-white px-10 py-5 rounded-full font-bold uppercase tracking-widest text-xs shadow-xl" data-i18n="hero-btn-quote">Get a Free Quote</button>
+      <button onclick="scrollToSection(event, 'services')" class="border-2 border-stone-900 text-stone-900 px-10 py-5 rounded-full font-bold uppercase tracking-widest text-xs hover:bg-stone-900 hover:text-white transition" data-i18n="hero-btn-services">View Services</button>
+    </div>
+  </header>
+
+  <!-- Servicios -->
+  <section id="services" class="py-32 bg-stone-900 text-[#f2ebe1]">
+    <div class="max-w-7xl mx-auto px-6">
+      <div class="mb-20">
+        <h2 class="tech-font text-orange-500 font-bold mb-4 uppercase tracking-[0.2em] text-sm" data-i18n="services-pre">01 / Specialties</h2>
+        <h3 class="text-5xl font-black uppercase leading-none" data-i18n="services-title">Elite Masonry Services</h3>
+        <p class="text-stone-400 mt-6 max-w-lg" data-i18n="services-desc">Click each card to explore the full gallery and see the transformation process.</p>
+      </div>
+      <div class="grid md:grid-cols-3 gap-8">
+        <!-- Tarjetas de Servicio -->
+        <div class="project-card p-10 group" onclick="openProject('brick')">
+          <h4 class="text-orange-500 tech-font text-xs font-bold mb-4" data-i18n="serv1-tag">MASONRY</h4>
+          <h5 class="text-xl font-black uppercase mb-4 group-hover:text-orange-500 transition" data-i18n="serv1-title">Antique Brick Veneer</h5>
+          <p class="text-stone-400 text-sm mb-6" data-i18n="serv1-desc">Expert brick installation with period-correct aesthetics.</p>
+          <span class="text-orange-500 font-bold text-xs uppercase tracking-widest border-b border-orange-500 pb-1" data-i18n="explore-link">Explore Projects →</span>
+        </div>
+        <div class="project-card p-10 group" onclick="openProject('heritage')">
+          <h4 class="text-orange-500 tech-font text-xs font-bold mb-4" data-i18n="serv2-tag">STONEWORK</h4>
+          <h5 class="text-xl font-black uppercase mb-4 group-hover:text-orange-500 transition" data-i18n="serv2-title">Heritage Stone Masonry</h5>
+          <p class="text-stone-400 text-sm mb-6" data-i18n="serv2-desc">Natural and high-quality cultured stone built to last generations.</p><span class="text-orange-500 font-bold text-xs uppercase tracking-widest border-b border-orange-500 pb-1" data-i18n="explore-link">Explore Projects →</span>
+        </div>
+        <div class="project-card p-10 group" onclick="openProject('drystack')">
+          <h4 class="text-orange-500 tech-font text-xs font-bold mb-4" data-i18n="serv3-tag">PRECISION</h4>
+          <h5 class="text-xl font-black uppercase mb-4 group-hover:text-orange-500 transition" data-i18n="serv3-title">Artisan Dry Stack</h5>
+          <p class="text-stone-400 text-sm mb-6" data-i18n="serv3-desc">Perfectly stacked stone without visible mortar.</p>
+          <span class="text-orange-500 font-bold text-xs uppercase tracking-widest border-b border-orange-500 pb-1" data-i18n="explore-link">Explore Projects →</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Galería Destacada -->
+  <section id="projects" class="py-32 max-w-7xl mx-auto px-6">
+    <div class="mb-20 text-center">
+      <h2 class="tech-font text-orange-700 font-bold text-sm tracking-widest uppercase mb-4" data-i18n="gallery-pre">Proven Quality</h2>
+      <h3 class="text-4xl md:text-5xl font-black uppercase text-stone-900" data-i18n="gallery-title">Transformation Gallery</h3>
+    </div>
+    <div class="grid lg:grid-cols-2 gap-16 items-center">
+      <div class="comparison-container" id="comp-home">
+        <img src="heritage_before.jpg" class="comparison-img img-before" alt="Antes" onerror="this.src='https://images.unsplash.com/photo-1589939705384-5185137a7f0f?q=80&w=1000'">
+        <img src="heritage_after.jpg" class="comparison-img img-after" alt="Después" onerror="this.src='https://images.unsplash.com/photo-1590059391056-9be70be38686?q=80&w=1000'">
+        <div class="slider-handle"><div class="slider-button"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M8 7l-5 5m0 0l5 5m-5-5h18m-5-5l5 5m0 0l-5 5"></path></svg></div></div>
+      </div>
+      <div class="space-y-6">
+        <span class="label-tag" data-i18n="feat-project">Featured Project</span>
+        <h4 class="text-3xl font-black uppercase tracking-tighter" data-i18n="feat-title">Heritage Retaining Wall</h4>
+        <p class="text-stone-600 leading-relaxed text-lg" data-i18n="feat-desc">Witness how we transform raw terrain into a masterpiece of engineering.</p>
+        <button onclick="openProject('heritage')" class="bg-stone-900 text-white px-8 py-3 rounded-full tech-font text-[10px] font-bold uppercase tracking-widest hover:bg-orange-700 transition" data-i18n="view-details">View Details</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Modal Proyecto (Vista Detalle con Antes/Después) -->
+  <div id="projectModal" class="modal">
+    <span class="close-modal" onclick="closeModal()">&times;</span>
+    <div class="modal-content">
+      <div class="p-8 md:p-12">
+        <h2 id="modalTitle" class="text-4xl font-black uppercase text-stone-900 mb-4 tracking-tighter">Title</h2>
+        <div id="modalLabel" class="label-tag inline-block mb-8">Category</div>
+        <p id="modalDesc" class="text-stone-600 text-lg mb-12 max-w-2xl leading-relaxed">Description</p>
+        <div class="comparison-container mb-12" id="modal-comp">
+          <img id="imgBefore" src="" class="comparison-img img-before" alt="Antes">
+          <img id="imgAfter" src="" class="comparison-img img-after" alt="Después">
+          <div class="slider-handle"><div class="slider-button"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M8 7l-5 5m0 0l5 5m-5-5h18m-5-5l5 5m0 0l-5 5"></path></svg></div></div>
+        </div><div class="flex flex-col sm:flex-row justify-center gap-4">
+          <button onclick="closeModal()" class="bg-stone-200 text-stone-900 px-8 py-4 rounded-full font-bold uppercase tracking-widest text-xs" data-i18n="modal-return">Return to Services</button>
+          <button onclick="viewFullGallery()" class="bg-stone-900 text-white px-8 py-4 rounded-full font-bold uppercase tracking-widest text-xs" data-i18n="modal-gallery">View Full Gallery</button>
+          <button onclick="scrollToSection(event, 'contact', true)" class="bg-orange-700 text-white px-8 py-4 rounded-full font-bold uppercase tracking-widest text-xs shadow-lg" data-i18n="nav-cta">Get a Free Quote</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Galería Completa (Aquí se incluyen los videos) -->
+  <div id="galleryModal" class="modal" style="z-index: 200;">
+    <span class="close-modal" onclick="closeGalleryModal()">&times;</span>
+    <div class="modal-content !max-w-[1200px]">
+      <div class="p-8 md:p-12">
+        <h2 id="galleryTitle" class="text-4xl font-black uppercase text-stone-900 mb-8 tracking-tighter">Gallery</h2>
+        <div class="gallery-grid" id="galleryContainer"></div>
+        <div class="mt-12 text-center">
+          <button onclick="closeGalleryModal()" class="bg-orange-700 text-white px-12 py-4 rounded-full font-bold uppercase tracking-widest text-sm" data-i18n="close-gallery">Close Gallery</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contacto -->
+  <section id="contact" class="py-32 px-6 bg-white">
+    <div class="max-w-4xl mx-auto text-center">
+      <h2 class="text-4xl md:text-6xl font-black uppercase text-stone-900 mb-6 tracking-tighter" data-i18n="contact-title">Ready to build<br>your vision?</h2>
+      <p class="text-stone-500 text-lg mb-12" data-i18n="contact-desc">Let's turn your vision into a lasting masterpiece.</p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <a href="tel:5094702560" class="flex flex-col items-center p-10 bg-stone-100 rounded-2xl hover:bg-orange-700 hover:text-white transition group"><span class="font-black uppercase tracking-widest text-xs" data-i18n="call-btn">Call Jairo</span></a>
+        <a href="sms:+15094702560" class="flex flex-col items-center p-10 bg-stone-100 rounded-2xl hover:bg-orange-700 hover:text-white transition group"><span class="font-black uppercase tracking-widest text-xs" data-i18n="sms-btn">Send Text</span></a>
+        <a href="mailto:cibtianfer@gmail.com" class="flex flex-col items-center p-10 bg-stone-100 rounded-2xl hover:bg-orange-700 hover:text-white transition group"><span class="font-black uppercase tracking-widest text-xs" data-i18n="email-btn">Email Inquiry</span></a>
+      </div>
+      <p class="mt-12 tech-font text-[10px] text-stone-400 uppercase tracking-[0.4em] font-bold" data-i18n="location">Serving Gilbert, AZ & Surrounding Areas</p>
+    </div>
+  </section>
+
+  <script>
+    const translations = {
+      en: {
+        "nav-subtitle": "Artisan Masonry",
+        "nav-projects": "Projects",
+        "nav-services": "Services",
+        "nav-cta": "Get a Free Quote",
+        "hero-title": "Stone &<br>Legacy",
+        "hero-quote": "\"Building with the strength of nature and the precision of a master craftsman.\"",
+        "hero-btn-quote": "Get a Free Quote",
+        "hero-btn-services": "View Services",
+        "services-pre": "01 / Specialties",
+        "services-title": "Elite Masonry Services",
+        "services-desc": "Click each card to explore the full gallery and see the transformation process.",
+        "serv1-tag": "MASONRY",
+        "serv1-title": "Antique Brick Veneer",
+        "serv1-desc": "Expert brick installation with period-correct aesthetics.",
+        "serv2-tag": "STONEWORK",
+        "serv2-title": "Heritage Stone Masonry",
+        "serv2-desc": "Natural and high-quality cultured stone built to last generations.","serv3-tag": "PRECISION",
+        "serv3-title": "Artisan Dry Stack",
+        "serv3-desc": "Perfectly stacked stone without visible mortar.",
+        "explore-link": "Explore Projects →",
+        "gallery-pre": "Proven Quality",
+        "gallery-title": "Transformation Gallery",
+        "feat-project": "Featured Project",
+        "feat-title": "Heritage Retaining Wall",
+        "feat-desc": "Witness how we transform raw terrain into a masterpiece of engineering.",
+        "view-details": "View Details",
+        "modal-return": "Return to Services",
+        "modal-gallery": "View Full Gallery",
+        "close-gallery": "Close Gallery",
+        "contact-title": "Ready to build<br>your vision?",
+        "contact-desc": "Let's turn your vision into a lasting masterpiece. Contact me today.",
+        "call-btn": "Call Jairo",
+        "sms-btn": "Send Text",
+        "email-btn": "Email Inquiry",
+        "location": "Serving Gilbert, AZ & Surrounding Areas",
+        "lang-btn": "ESP",
+        "gallery-suffix": "Collection"
+      },
+      es: {
+        "nav-subtitle": "Mampostería Artesanal",
+        "nav-projects": "Proyectos",
+        "nav-services": "Servicios",
+        "nav-cta": "Obtén una cotización gratuita",
+        "hero-title": "Piedra &<br>Legado",
+        "hero-quote": "\"Construyendo con la fuerza de la naturaleza y la precisión de un maestro artesano.\"",
+        "hero-btn-quote": "Solicita tu cotización gratuita",
+        "hero-btn-services": "Ver Servicios",
+        "services-pre": "01 / Especialidades",
+        "services-title": "Servicios Elite de Mampostería",
+        "services-desc": "Haz clic en cada tarjeta para explorar la galería completa y ver el proceso de transformación.",
+        "serv1-tag": "ALBAÑILERÍA",
+        "serv1-title": "Enchapado de Ladrillo Antiguo",
+        "serv1-desc": "Instalación experta de ladrillo con estética de época.",
+        "serv2-tag": "TRABAJO EN PIEDRA",
+        "serv2-title": "Mampostería Heritage",
+        "serv2-desc": "Piedra natural y cultivada de alta calidad, construida para durar generaciones.",
+        "serv3-tag": "PRECISIÓN",
+        "serv3-title": "Dry Stack Artesanal",
+        "serv3-desc": "Piedra apilada perfectamente sin mortero visible.",
+        "explore-link": "Explorar Proyectos →",
+        "gallery-pre": "Calidad Comprobada",
+        "gallery-title": "Galería de Transformaciones",
+        "feat-project": "Proyecto Destacado",
+        "feat-title": "Muro de Contención Heritage",
+        "feat-desc": "Sea testigo de cómo transformamos terrenos naturales en obras maestras de ingeniería.",
+        "view-details": "Ver Detalles",
+        "modal-return": "Volver a Servicios",
+        "modal-gallery": "Ver Galería Completa",
+        "close-gallery": "Cerrar Galería",
+        "contact-title": "¿Listo para realizar<br>tu visión?",
+        "contact-desc": "Permítanos convertir su idea en una obra maestra duradera. Contácteme hoy mismo.",
+        "call-btn": "Llamar a Jairo",
+        "sms-btn": "Enviar SMS",
+        "email-btn": "Enviar Correo",
+        "location": "Sirviendo a Gilbert, AZ y áreas circundantes",
+        "lang-btn": "ENG",
+        "gallery-suffix": "Colección"
+      }
+    };
+
+    const projectsData = {
+      brick: {
+        en: {
+          title: "Antique Brick Veneer",
+          label: "Masonry",
+          desc: "Expert brick installation with period-correct aesthetics and durability."
+        },
+        es: {
+          title: "Enchapado de Ladrillo Antiguo",
+          label: "Albañilería",
+          desc: "Instalación experta de ladrillos con estética de época y máxima durabilidad."
+        },
+        images: {
+          before: "brick_before.jpg",
+          after: "brick_after.jpg",
+          video: null, // No hay video para Brick
+          gallery: Array.from({length: 20}, (_, i) => `brick_${i + 1}.jpeg`)
+        }
+      },
+      heritage: {
+        en: {
+          title: "Heritage Stone Masonry",
+          label: "Stonework",
+          desc: "Crafting beautiful structures using natural and high-quality cultured stone built to last generations."
+        },
+        es: {
+          title: "Mampostería de Piedra Heritage",
+          label: "Piedra",
+          desc: "Creación de hermosas estructuras utilizando piedra natural y cultivada de alta calidad, diseñadas para perdurar."
+        },
+        images: {
+          before: "heritage_before.jpg",
+          after: "heritage_after.jpg",
+          video: "heritage_video.mp4",
+          gallery: Array.from({length: 20}, (_, i) => `heritage_${i + 1}.jpeg`)
+        }
+      },
+      drystack: {
+        en: {
+          title: "Artisan Dry Stack",
+          label: "Precision",
+          desc: "Perfectly stacked stone without visible mortar for a clean, professional look."
+        },
+        es: {
+          title: "Dry Stack Artesanal",
+          label: "Precisión",
+          desc: "Piedra apilada perfectamente sin mortero visible para un acabado limpio y profesional."
+        },
+        images: {
+          before: "drystack_before.jpg",
+          after: "drystack_after.jpg",
+          video: "drystack_video.mp4",
+          gallery: Array.from({length: 20}, (_, i) => `drystack_${i + 1}.jpeg`)
+        }
+      }
+    };
+
+    let currentLang = 'en';
+    let currentActiveKey = '';
+
+    function toggleLanguage() {
+      currentLang = currentLang === 'en' ? 'es' : 'en';
+      document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        if (translations[currentLang][key]) el.innerHTML = translations[currentLang][key];
+      });
+      document.getElementById('lang-label').innerText = translations[currentLang]['lang-btn'];
+      if (document.getElementById('projectModal').style.display === 'block') {
+        updateModalContent(currentActiveKey);
+      }
+    }
+
+    function updateModalContent(key) {
+      const data = projectsData[key][currentLang];
+      const imgs = projectsData[key].images;
+      document.getElementById('modalTitle').innerText = data.title;
+      document.getElementById('modalLabel').innerText = data.label;
+      document.getElementById('modalDesc').innerText = data.desc;
+      document.getElementById('imgBefore').src = imgs.before;
+      document.getElementById('imgAfter').src = imgs.after;
+    }
+
+    function openProject(key) {
+      currentActiveKey = key;
+      updateModalContent(key);
+      document.getElementById('projectModal').style.display = 'block';
+      document.body.style.overflow = 'hidden';
+      setTimeout(() => initComparison('modal-comp'), 100);
+    }
+
+    function viewFullGallery() {
+      const data = projectsData[currentActiveKey][currentLang];
+      const imgs = projectsData[currentActiveKey].images;
+      const gContainer = document.getElementById('galleryContainer');
+      document.getElementById('galleryTitle').innerText = `${data.title} - ${translations[currentLang]['gallery-suffix']}`;
+      gContainer.innerHTML = '';
+
+      // Añadir video a la galería como primer elemento si existe (excepto en Brick)
+      if (imgs.video) {
+        const videoItem = document.createElement('div');
+        videoItem.className = 'gallery-item relative cursor-pointer';
+        videoItem.innerHTML = `
+          <video controls muted playsinline poster="${imgs.after}">
+            <source src="${imgs.video}" type="video/mp4">
+          </video>
+          <div class="video-overlay"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+        `;
+        // Ocultar overlay cuando empiece a reproducir
+        videoItem.onclick = (e) => {
+          const v = videoItem.querySelector('video');
+          const overlay = videoItem.querySelector('.video-overlay');
+          if(v.paused) {
+            v.play();
+            overlay.style.opacity = '0';
+          }else {
+            v.pause();
+            overlay.style.opacity = '1';
+          }
+        };
+        gContainer.appendChild(videoItem);
+      }
+
+      imgs.gallery.forEach(url => {
+        const div = document.createElement('div');
+        div.className = 'gallery-item';
+        div.innerHTML = `<img src="${url}" onerror="this.src='https://via.placeholder.com/600x600?text=${url}'">`;
+        gContainer.appendChild(div);
+      });
+      document.getElementById('galleryModal').style.display = 'block';
+    }
+
+    function closeModal() {
+      document.getElementById('projectModal').style.display = 'none';
+      document.body.style.overflow = 'auto';
+    }
+
+    function closeGalleryModal() {
+      // Pausar cualquier video que se esté reproduciendo al cerrar
+      document.querySelectorAll('#galleryContainer video').forEach(v => v.pause());
+      document.getElementById('galleryModal').style.display = 'none';
+    }
+
+    function initComparison(id) {
+      const container = document.getElementById(id);
+      if (!container) return;
+      const afterImg = container.querySelector('.img-after');
+      const handle = container.querySelector('.slider-handle');
+      let isResizing = false;
+
+      const updateSlider = (x) => {
+        const rect = container.getBoundingClientRect();
+        let pos = ((x - rect.left) / rect.width) * 100;
+        pos = Math.max(0, Math.min(100, pos));
+        afterImg.style.clipPath = `inset(0 ${100 - pos}% 0 0)`;
+        handle.style.left = `${pos}%`;
+      };
+
+      const onStart = (e) => {
+        isResizing = true;
+        const x = e.pageX || (e.touches ? e.touches[0].pageX : 0);
+        updateSlider(x);
+      };
+      const onMove = (e) => {
+        if (!isResizing) return;
+        const x = e.pageX || (e.touches ? e.touches[0].pageX : 0);
+        updateSlider(x);
+      };
+      const onEnd = () => { isResizing = false; };
+
+      container.addEventListener('mousedown', onStart);
+      window.addEventListener('mousemove', onMove);
+      window.addEventListener('mouseup', onEnd);
+
+      container.addEventListener('touchstart', onStart, {passive: false});
+      window.addEventListener('touchmove', onMove, {passive: false});
+      window.addEventListener('touchend', onEnd);
+    }
+
+    function scrollToSection(e, id, modal = false) {
+      if(e) e.preventDefault();
+      if(modal) {
+        closeModal();
+        closeGalleryModal();
+      }
+      const target = document.getElementById(id);
+      if(target) target.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    window.onload = () => {
+      initComparison('comp-home');
+    };
+  </script>
+</body>
+</html>
