@@ -44,7 +44,7 @@
       pointer-events: none;
     }
     .img-before { z-index: 1; }
-    .img-after { z-index: 2; clip-path: inset(0 50% 0 0); }
+    .img-after { z-index: 2; clip-path: inset(0 0% 0 0); }
     .slider-handle {
       position: absolute;
       top: 0;
@@ -191,7 +191,15 @@
       cursor: pointer;
       box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     }
-  </style>
+  
+  @keyframes pulse-handle {
+    0% { transform: translateX(-50%) scale(1); }
+    50% { transform: translateX(-50%) scale(1.1); }
+    100% { transform: translateX(-50%) scale(1); }
+  }
+  .slider-handle {
+    animation: pulse-handle 2s infinite;
+  }</style>
 </head>
 <body class="stone-pattern" id="top">
   <!-- Navegación -->
@@ -583,6 +591,8 @@
       };
 
       const onStart = (e) => {
+        // Solo activar arrastre si el clic es en el handle o su botón
+        if (!e.target.closest('.slider-handle')) return;
         isResizing = true;
         const x = e.pageX || (e.touches ? e.touches[0].pageX : 0);
         updateSlider(x);
