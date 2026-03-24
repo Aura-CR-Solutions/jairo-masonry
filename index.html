@@ -187,7 +187,8 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      pointer-events: none;
+      pointer-events: auto;
+      cursor: pointer;
       box-shadow: 0 4px 15px rgba(0,0,0,0.3);
     }
   </style>
@@ -504,7 +505,6 @@
       const gContainer = document.getElementById('galleryContainer');
       document.getElementById('galleryTitle').innerText = `${data.title} - ${translations[currentLang]['gallery-suffix']}`;
       gContainer.innerHTML = '';
-
       // Añadir video a la galería como primer elemento si existe (excepto en Brick)
       if (imgs.video) {
         const videoItem = document.createElement('div');
@@ -513,20 +513,35 @@
           <video controls muted playsinline poster="${imgs.after}">
             <source src="${imgs.video}" type="video/mp4">
           </video>
-          <div class="video-overlay"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+          <div class="video-overlay cursor-pointer"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
         `;
-        // Ocultar overlay cuando empiece a reproducir
-        videoItem.onclick = (e) => {
-          const v = videoItem.querySelector('video');
-          const overlay = videoItem.querySelector('.video-overlay');
+        const v = videoItem.querySelector('video');
+        const overlay = videoItem.querySelector('.video-overlay');
+        
+        // Solo el overlay inicia reproducción
+        overlay.onclick = (e) => {
+          e.stopPropagation();
           if(v.paused) {
             v.play();
-            overlay.style.opacity = '0';
-          }else {
+          } else {
             v.pause();
-            overlay.style.opacity = '1';
           }
         };
+        
+        // Ocultar overlay al reproducir, mostrar al pausar
+        v.addEventListener('play', () => {
+          overlay.style.opacity = '0';
+        });
+        v.addEventListener('pause', () => {
+          overlay.style.opacity = '1';
+        });
+        
+        // Evitar que clic en video active play/pause (dejar controles nativos)
+        v.onclick = (e) => {
+          e.stopPropagation();
+          // No hacer nada, dejar que controls nativos manejen
+        };
+        
         gContainer.appendChild(videoItem);
       }
 
